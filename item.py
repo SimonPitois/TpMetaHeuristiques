@@ -1,6 +1,6 @@
 class Item:
     """
-    Cette classe représente un rectangle (un item) avec une largeur et une hauteur.
+    Cette classe représente un item avec une largeur et une hauteur.
     """
 
     def __init__(self, width, height):
@@ -15,7 +15,7 @@ class Item:
 
     def __str__(self):
         """
-        Méthode qui renvoie une représentation de chaîne conviviale de l'objet.
+        Méthode qui renvoie une représentation de l'objet sous forme de chaîne de caractères.
 
         @return: Représentation de l'item sous forme de chaîne.
         """
@@ -23,7 +23,8 @@ class Item:
 
     def __repr__(self):
         """
-        Méthode qui renvoie une représentation de chaîne de l'objet qui est utile pour la débogage.
+        Méthode qui renvoie une représentation de l'objet sous forme de chaîne de caractères
+        qui est utile pour le débogage.
 
         @return: Représentation de l'item sous forme de chaîne.
         """

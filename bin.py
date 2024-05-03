@@ -50,6 +50,12 @@ class Bin:
         return sum
 
     def items(self):
+        """
+        Donne tous les items contenus dans la boîte.
+        Complexité temporelle : O(n²)
+
+        @return: Les items contenus dans la boîte.
+        """
         items = []
         for shelf in self.shelves:
             items += shelf.items
@@ -57,7 +63,7 @@ class Bin:
 
     def __str__(self):
         """
-        Méthode qui renvoie une représentation de chaîne conviviale de l'objet Bin.
+        Méthode qui renvoie une représentation de l'objet sous forme de chaîne de caractères.
 
         @return: Représentation de la boîte sous forme de chaîne.
         """
@@ -69,7 +75,8 @@ class Bin:
 
     def __repr__(self):
         """
-        Méthode spéciale qui renvoie une représentation de chaîne de l'objet Bin qui est utile pour le débogage.
+        Méthode qui renvoie une représentation de l'objet sous forme de chaîne de caractères
+        qui est utile pour le débogage.
 
         @return: Représentation de la boîte sous forme de chaîne.
         """

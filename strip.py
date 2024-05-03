@@ -1,16 +1,17 @@
-from avl import AVLTree
+from avltree import AVLTree
 from shelf import *
 
 
 def merge(arr, l, m, r):
     """
     Fusionne deux parties d'un tableau en utilisant un algorithme de fusion.
+    Complexité temporelle : O(n)
 
-    @param arr: Le tableau à fusionner.
-    @param l: Indice du début de la première moitié du tableau.
-    @param m: Indice du milieu du tableau.
-    @param r: Indice de fin de la deuxième moitié du tableau.
-    @return: Le tableau après fusion.
+    @param arr : Le tableau à fusionner.
+    @param l : Indice du début de la première moitié du tableau.
+    @param m : Indice du milieu du tableau.
+    @param r : Indice de fin de la deuxième moitié du tableau.
+    @return : Le tableau après fusion.
     """
     n1 = m - l + 1
     n2 = r - m
@@ -51,12 +52,12 @@ def merge(arr, l, m, r):
 def merge_sort(arr, l, r):
     """
     Trie un tableau en utilisant l'algorithme de tri fusion.
-    Complexité temporelle : O(nlog(n))
+    Complexité temporelle : O(n log(n))
 
-    @param arr: Le tableau à trier.
-    @param l: Indice du début du tableau.
-    @param r: Indice de fin du tableau.
-    @return: Le tableau trié.
+    @param arr : Le tableau à trier.
+    @param l : Indice du début du tableau.
+    @param r : Indice de fin du tableau.
+    @return : Le tableau trié.
     """
     if l < r:
         m = l + (r - l) // 2
@@ -87,21 +88,19 @@ class Strip:
         """
         Trie les items à insérer dans la bande par ordre de hauteur décroissante.
         Complexité temporelle : 0(n log(n))
-
-        @return: La liste d'items trié par hauteur décroissante.
         """
         merge_sort(self.items, 0, len(self.items) - 1)
         self.items.reverse()
 
     def minimum_residual_space(self, root, item_width, minimum):
         """
-        Cherche le niveau dont l'espace horizontal résiduel est minimum pour l'item à insérer.
+        Cherche dans l'arbre AVL le niveau dont l'espace horizontal résiduel est minimum pour l'item à insérer.
         Complexité temporelle : O(log(n))
 
-        @param root: Un noeud de l'arbre AVL (on commence généralement à la racine).
-        @param item_width: La largeur de l'item à insérer.
-        @param minimum: Un noeud de l'arbre AVL (paramètre évolutif qui stocke le meilleur niveau pour l'item)
-        @return: Le noeud de l'arbre AVL qui contient le niveau le plus adéquat pour l'item à insérer.
+        @param root : Un noeud de l'arbre AVL (on commence généralement à la racine).
+        @param item_width : La largeur de l'item à insérer.
+        @param minimum : Un noeud de l'arbre AVL (paramètre évolutif qui stocke le meilleur niveau pour l'item)
+        @return : Le noeud de l'arbre AVL qui contient le niveau le plus adéquat pour l'item à insérer.
         """
         if root is None:
             return minimum
@@ -114,11 +113,11 @@ class Strip:
 
     def add_shelf(self, item, index):
         """
-        Ajoute à un nouveau niveau au strip et met à jour l'arbre AVL contenant les espaces horizontaux résiduels.
+        Ajoute un nouveau niveau dans la bande et met à jour l'arbre AVL contenant les espaces horizontaux résiduels.
         Complexité temporelle : O(log(n))
 
-        @param item: L'item à insérer dans le strip.
-        @param index: Un index relatif à la position du nouveau niveau dans la liste des niveaux du strip.
+        @param item : L'item à insérer dans la bande.
+        @param index : Un index relatif à la position du nouveau niveau dans la liste des niveaux de la bande.
         """
         avl = AVLTree()
         self.shelves.append(Shelf(self.width, item.height))
@@ -152,9 +151,7 @@ class Strip:
     def fill(self):
         """
         Remplit la bande avec les items à insérer.
-        Complexité temporelle : O(nlog(n))
-
-        @return: La bande remplit.
+        Complexité temporelle : O(n log(n))
         """
         self.sort_items_decreasing_height()
         for item in self.items:
@@ -162,7 +159,7 @@ class Strip:
 
     def __str__(self):
         """
-        Méthode qui renvoie une représentation de chaîne conviviale de l'objet Strip.
+        Méthode qui renvoie une représentation de l'objet sous forme de chaîne de caractères.
 
         @return: Représentation de la bande sous forme de chaîne.
         """
@@ -173,7 +170,8 @@ class Strip:
 
     def __repr__(self):
         """
-        Méthode spéciale qui renvoie une représentation de chaîne de l'objet Strip qui est utile pour le débogage.
+        Méthode qui renvoie une représentation de l'objet sous forme de chaîne de caractères
+        qui est utile pour le débogage.
 
         @return: Représentation de la bande sous forme de chaîne.
         """
@@ -181,4 +179,3 @@ class Strip:
         for i in range(len(self.shelves)):
             result += "----------Level %s----------" % i + "\n" + str(self.shelves[i])
         return result
-

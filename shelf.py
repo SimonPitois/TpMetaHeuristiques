@@ -2,6 +2,7 @@ class Shelf:
     """
     Cette classe représente un niveau.
     """
+
     def __init__(self, width, height):
         """
         Initialise une nouvelle instance de la classe Shelf avec la largeur et la hauteur données.
@@ -26,7 +27,7 @@ class Shelf:
 
     def __str__(self):
         """
-        Méthode qui renvoie une représentation de chaîne conviviale de l'objet Shelf.
+        Méthode qui renvoie une représentation de l'objet sous forme de chaîne de caractères.
 
         @return: Représentation du niveau sous forme de chaîne.
         """
@@ -40,7 +41,8 @@ class Shelf:
 
     def __repr__(self):
         """
-        Méthode qui renvoie une représentation de chaîne de l'objet Shelf qui est utile pour le débogage.
+        Méthode qui renvoie une représentation de l'objet sous forme de chaîne de caractères
+        qui est utile pour le débogage.
 
         @return: Représentation du niveau sous forme de chaîne.
         """

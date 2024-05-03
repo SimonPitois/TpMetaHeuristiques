@@ -1,16 +1,22 @@
+import copy
 import random
+import tkinter as tk
+
 from item import *
 from strip import *
 from bin import *
 
 WIDTH = 10
 HEIGHT = 10
-donnees = [Item(5, 9), Item(4, 2), Item(10, 6),
-           Item(5, 7), Item(6, 3), Item(10, 7),
-           Item(1, 5), Item(3, 5), Item(6, 9),
-           Item(2, 4), Item(6, 7), Item(7, 2),
-           Item(8, 3), Item(4, 10), Item(4, 5),
-           Item(10, 3), Item(7, 8), Item(8, 7)]
+items = [Item(5, 9), Item(4, 2), Item(10, 6),
+         Item(5, 7), Item(6, 3), Item(10, 7),
+         Item(1, 5), Item(3, 5), Item(6, 9),
+         Item(2, 4), Item(6, 7), Item(7, 2),
+         Item(8, 3), Item(4, 10), Item(4, 5),
+         Item(10, 3), Item(7, 8), Item(8, 7)]
+
+
+# --------------------------------- FINITE BEST STRIP ---------------------------------
 
 
 def minimum_residual_space(root, shelf_height, minimum):
@@ -18,10 +24,10 @@ def minimum_residual_space(root, shelf_height, minimum):
     Cherche la boîte dont l'espace vertical résiduel est minimum pour le niveau à insérer.
     Complexité temporelle : O(log(n))
 
-    @param root: Un noeud de l'arbre AVL (on commence généralement à la racine).
-    @param shelf_height: La hauteur du niveau à insérer.
-    @param minimum: Un noeud de l'arbre AVL (paramètre évolutif qui stocke la meilleure boîte pour le niveau)
-    @return: Le noeud de l'arbre AVL qui contient la boîte la plus adéquate pour le niveau à insérer.
+    @param root : Un noeud de l'arbre AVL (on commence généralement à la racine).
+    @param shelf_height : La hauteur du niveau à insérer.
+    @param minimum : Un noeud de l'arbre AVL (paramètre évolutif qui stocke la meilleure boîte pour le niveau)
+    @return : Le noeud de l'arbre AVL qui contient la boîte la plus adéquate pour le niveau à insérer.
     """
     if root is None:
         return minimum
@@ -33,9 +39,18 @@ def minimum_residual_space(root, shelf_height, minimum):
         return root
 
 
-# --------------------------------- FINITE BEST STRIP ---------------------------------
-def finite_best_strip(donnees):
-    strip = Strip(WIDTH, donnees)
+def finite_best_strip(items):
+    """
+    Cette méthode implémente l'heuristique FBS qui trie initialement les items par hauteur décroissante et se compose
+    de deux phases. Tout d'abord, les items sont emballés dans une bande de hauteur infinie et répartis sur différents
+    niveaux qui ont une largeur égale à la largeur de la bande et une hauteur différente. Dans la deuxième phase les
+    niveaux sont rangées dans des boîtes.
+    Complexité temporelle : O(n log(n))
+
+    @param items : Les items à répartir dans les boîtes.
+    @return : La liste des boîtes contenant les items.
+    """
+    strip = Strip(WIDTH, items)
     strip.fill()
     bins = []
     avl = AVLTree()
@@ -61,15 +76,17 @@ def finite_best_strip(donnees):
     return bins
 
 
+# --------------------------------- LOCAL SEARCH ---------------------------------
+
 def quantity(bin):
     """
-    Donne une quantité relative à une boîte et qui sera utile pour décider de la "weakest bin"
+    Donne une quantité relative à une boîte qui sera utile pour décider de la "weakest bin".
     Complexité temporelle : O(n²)
 
-    @param bin: Une boîte.
-    @return: La quantité de la boîté donnée.
+    @param bin : Une liste de boîtes contenant des items.
+    @return : La quantité de la boîte donnée.
     """
-    return (5 * (bin.items_weight() / (HEIGHT * WIDTH))) - (bin.nb_items() / len(donnees))
+    return (5 * (bin.items_weight() / (HEIGHT * WIDTH))) - (bin.nb_items() / len(items))
 
 
 def weakest_bin(bins):
@@ -77,8 +94,8 @@ def weakest_bin(bins):
     Donne la "weakest bin" parmi toutes les boîtes.
     Complexité temporelle : O(n^3)
 
-    @param bins: Des boîtes.
-    @return: La "weakest bin".
+    @param bins : Une liste de boîtes contenant des items.
+    @return : La "weakest bin".
     """
     weakest = None
     weakest_quantity = 0
@@ -94,8 +111,15 @@ def weakest_bin(bins):
     return weakest
 
 
-# --------------------------------- LOCAL SEARCH ---------------------------------
 def local_search(bins):
+    """
+    Cette méthode implémente la recherche locale qui explore le voisinage de la solution initiale en déterminant
+    la "weakest bin" et en considérant, tour à tour, chaque élément actuellement rangé dans la "weakest bin" et
+    dans les autres boîtes.
+
+    @param bins : Une liste de boîtes contenant des items.
+    @return : La liste de boîtes possiblement amélioré.
+    """
     weakest = weakest_bin(bins)
     while True:
         if weakest.nb_items() == 0:
@@ -110,9 +134,16 @@ def local_search(bins):
                         if len(result) == 1:
                             bins.remove(bin)
                             bins.append(result[0])
+                            tmp = item.width
                             shelf.items.remove(item)
                             if len(shelf.items) == 0:
+                                weakest.residual_vertical_space += shelf.height
                                 weakest.shelves.remove(shelf)
+                            else:
+                                shelf.residual_horizontal_space += tmp
+                                weakest.residual_vertical_space = (weakest.residual_vertical_space + shelf.height -
+                                                                   shelf.items[0].height)
+                                shelf.height = shelf.items[0].height
                             break
         if weakest.nb_items() == size_weakest:
             break
@@ -120,7 +151,14 @@ def local_search(bins):
 
 # --------------------------------- SHAKING / DIVERSIFICATION PROCEDURE ---------------------------------
 def shaking(current_packing, k):
-    if k > len(donnees):
+    """
+    Cette méthode implémente la "shaking procedure" qui utilise une répartition initiale d'items dans des boîtes
+    et procède à une diversification en déplaçant séparément un certain nombre de ces items dans de nouvelles boîtes.
+
+    @param current_packing : Une liste de boîtes contenant des items.
+    @param k : Le nombre d'items à insérer séparément dans une nouvelle boîte.
+    """
+    if k > len(items):
         print("Erreur : trop d'items à modifier")
     else:
         nb_bins = len(current_packing)
@@ -132,28 +170,68 @@ def shaking(current_packing, k):
             current_packing.append(Bin(WIDTH, HEIGHT))
             current_packing[-1].add_shelf(Shelf(WIDTH, random_item.height))
             current_packing[-1].shelves[0].add_item(random_item)
+            tmp = random_item.width
             random_shelf.items.remove(random_item)
             if len(random_shelf.items) == 0:
+                random_bin.residual_vertical_space += random_shelf.height
                 random_bin.shelves.remove(random_shelf)
-            if len(random_bin.shelves) == 0:
-                current_packing.remove(random_bin)
-                nb_bins = nb_bins - 1
+                if len(random_bin.shelves) == 0:
+                    current_packing.remove(random_bin)
+                    nb_bins = nb_bins - 1
+            else:
+                random_shelf.residual_horizontal_space += tmp
+                random_bin.residual_vertical_space = (random_bin.residual_vertical_space + random_shelf.height -
+                                                      random_shelf.items[0].height)
+                random_shelf.height = random_shelf.items[0].height
 
 
-def basic_variable_neighborhood_search(donnees):
-    best_solution = finite_best_strip(donnees)
-    local_search(best_solution)
-    while len(best_solution) != 6:
-        #for i in range(len(best_solution)):
-            #print("----------Bin %s----------" % i + "\n" + str(best_solution[i].items()))
-        #print("")
-        shaking(best_solution,4)
-        local_search(best_solution)
+# --------------------------------- Basic Variable Neighborhood Search ---------------------------------
+def basic_variable_neighborhood_search(items, max):
+    """
+    Cette méthode effectue le "basic variable neighborhood search".
+
+    @param items : Les items à répartir dans les boîtes
+    @param max : Un nombre maximum d'itérations à effectuer avant d'arrêter la fonction.
+    @return : Une liste de boîtes contenant les items et représentant la solution "optimale"
+    """
+    optimal_solution = finite_best_strip(items)
+    local_search(optimal_solution)
+    k = 1
+    tmp = copy.deepcopy(optimal_solution)
+    while k <= max:
+        shaking(tmp, random.randrange(len(items)))
+        local_search(tmp)
+        if len(tmp) < len(optimal_solution):
+            optimal_solution = tmp
+        k = k + 1
+    return optimal_solution
+
+
+def draw_bins(canvas, bins):
+    """
+    Permet d'afficher les boîtes contenant les items.
+
+    @param canvas : Une interface graphique où dessiner les boîtes.
+    @param bins : Les boîtes contenant les items.
+    """
+    x = 50
+    for bin in bins:
+        y = 100
+        canvas.create_rectangle(x, y, x + bin.width * 8, y + bin.height * 8)
+        y += bin.height * 8
+        tmp = x
+        for shelf in bin.shelves:
+            for item in shelf.items:
+                canvas.create_rectangle(x, y - item.height * 8, x + item.width * 8, y, fill="green")
+                x += item.width * 8
+            y -= shelf.height * 8
+            x = tmp
+        x += bin.width * 2 + 100
 
 
 if __name__ == '__main__':
     """
-    strip = Strip(10, donnees)
+    strip = Strip(10, items)
     print("Avant classement par hauteur décroissante")
     print(strip.items)
     # strip.sort_items_decreasing_height()
@@ -161,12 +239,12 @@ if __name__ == '__main__':
     # print(strip.items)
     print("")
     # print("----------Test Strip----------")
-    # strip = Strip(WIDTH,donnees)
+    # strip = Strip(WIDTH,items)
     # strip.fill()
     # print(strip)
     # print("Nombre de niveau : " + str(len(strip.list)) + "\n")
     print("------Test Bins------" + "\n")
-    bins = finite_best_strip(donnees)
+    bins = finite_best_strip(items)
     for i in range(len(bins)):
         print("----------Bin %s----------" % i + "\n" + str(bins[i]))
     print("Nombre de bins : " + str(len(bins)))
@@ -189,11 +267,8 @@ if __name__ == '__main__':
     for i in range(len(bins)):
         print("----------Bin %s----------" % i + "\n" + str(bins[i].items()))
     print("")
-    print("---------Test Random---------")
-    print("")
-    random_numb = random.randrange(len(bins))
-    print(random_numb)
-    print("")
+    """
+    """
     print("---------Test Shaking---------")
     print("")
     shaking(bins, 5)
@@ -201,6 +276,12 @@ if __name__ == '__main__':
         print("----------Bin %s----------" % i + "\n" + str(bins[i].items()))
     print("")
     """
-    print(int(len(donnees) / 3))
-    basic_variable_neighborhood_search(donnees)
-    print("Done")
+    print("---------Basic Variable Neighborhood Search---------")
+    optimal = basic_variable_neighborhood_search(items, 1000)
+    print("Nombre de boîtes dans la solution \"optimale\" : ", len(optimal))
+    root = tk.Tk()
+    root.title("Affichage des boîtes")
+    canvas = tk.Canvas(root, width=2000, height=300)
+    canvas.pack()
+    draw_bins(canvas, optimal)
+    root.mainloop()

@@ -1,26 +1,50 @@
 from collections import deque
 
-# Create a tree node
-
 
 class TreeNode:
+    """
+    Cette classe représente un noeud pour un arbre AVL.
+    Il contient la valeur pour un espace résiduel et le(s) niveau(x) associé(s) à cette espace résiduel.
+    """
     def __init__(self, residual_space, shelf):
+        """
+        Initialise une nouvelle instance de la classe TreeNode avec un espace résiduel et un niveau.
+
+        @param residual_space: L'espace résiduel qui sera contenu dans le noeud.
+        @param shelf: Le niveau qui sera contenu dans le noeud.
+        """
         self.residual_space = residual_space
         self.left = None
         self.right = None
         self.height = 1
-        self.list = deque([shelf])
+        self.list = deque([shelf])  # La liste des niveaux contenus dans le noeud
 
     def add_shelf(self, shelf):
+        """
+        Ajoute un niveau dans le noeud.
+        Complexité temporelle : 0(1)
+
+        @param shelf: Le niveau à ajouter.
+        """
         self.list.append(shelf)
 
 
 class AVLTree:
+    """
+    Cette classe représente un arbre AVL contenant les valeurs relatives aux espaces résiduels.
+    """
 
-    # Function to insert a node
     def insert_node(self, root, residual_space, shelf):
+        """
+        Permet d'insérer un nouveau noeud dans l'arbre AVl ou de rajouter un niveau
+        dans un noeud déjà existant si la valeur pour l'espace résiduel est déjà présente.
+        Complexité temporelle : O(log(n))
 
-        # Find the correct location and insert the node
+        @param root : Un noeud de l'arbre AVL (le départ de se fait à la racine).
+        @param residual_space : L'espace résiduel à insérer dans l'arbre.
+        @param shelf : Le niveau associé à l'espace résiduel.
+        @return : L'arbre AVL mis à jour.
+        """
         if not root:
             return TreeNode(residual_space, shelf)
         elif residual_space < root.residual_space:
@@ -33,7 +57,6 @@ class AVLTree:
 
         root.height = 1 + max(self.get_height(root.left), self.get_height(root.right))
 
-        # Update the balance factor and balance the tree
         balance_factor = self.get_balance(root)
         if balance_factor > 1:
             if residual_space < root.left.residual_space:
@@ -51,10 +74,19 @@ class AVLTree:
 
         return root
 
-    # Function to delete a node
     def delete_node(self, root, residual_space, delete_head):
+        """
+        Permet de supprimer un noeud de l'arbre AVL. Pour être plus précis, la méthode
+        va chercher la valeur pour l'espace résiduel donné et supprimer l'élément en
+        en tête de la liste contenant les niveaux. Si jamais la liste est vide, alors
+        le noeud sera aussi supprimé.
+        Complexité temporelle : O(log(n))
 
-        # Find the node to be deleted and remove it
+        @param root : Un noeud de l'arbre AVL (le départ de se fait à la racine).
+        @param residual_space : L'espace résiduel à supprimer de l'arbre.
+        @param delete_head : Un booléen pour contrôler le bon fonctionnement de la méthode.
+        @return : L'arbre AVL mis à jour.
+        """
         if not root:
             return root
         elif residual_space < root.residual_space:
@@ -64,7 +96,7 @@ class AVLTree:
         else:
             if delete_head:
                 root.list.popleft()
-            if len(root.list) != 0:
+            if len(root.list) != 0 and delete_head:
                 return root
             else:
                 if root.left is None:
@@ -78,12 +110,10 @@ class AVLTree:
         if root is None:
             return root
 
-        # Update the balance factor of nodes
         root.height = 1 + max(self.get_height(root.left), self.get_height(root.right))
 
         balance_factor = self.get_balance(root)
 
-        # Balance the tree
         if balance_factor > 1:
             if self.get_balance(root.left) >= 0:
                 return self.right_rotate(root)
@@ -98,8 +128,14 @@ class AVLTree:
                 return self.left_rotate(root)
         return root
 
-    # Function to perform left rotation
     def left_rotate(self, z):
+        """
+        Fonction permettant d'effectuer une rotation vers la gauche sur un noeud de l'arbre AVL.
+        Complexité temporelle : O(1)
+
+        @param z : Un noeud de l'arbre AVL.
+        @return : L'arbre AVL mis à jour.
+        """
         y = z.right
         t2 = y.left
         y.left = z
@@ -108,8 +144,14 @@ class AVLTree:
         y.height = 1 + max(self.get_height(y.left), self.get_height(y.right))
         return y
 
-    # Function to perform right rotation
     def right_rotate(self, z):
+        """
+        Fonction permettant d'effectuer une rotation vers la droite sur un noeud de l'arbre AVL.
+        Complexité temporelle : O(1)
+
+        @param z : Un noeud de l'arbre AVL.
+        @return : L'arbre AVL mis à jour.
+        """
         y = z.left
         t3 = y.right
         y.right = z
@@ -118,24 +160,50 @@ class AVLTree:
         y.height = 1 + max(self.get_height(y.left), self.get_height(y.right))
         return y
 
-    # Get the height of the node
     def get_height(self, root):
+        """
+        Fonction permettant d'obtenir la hauteur d'un noeud de l'arbre AVL.
+        Complexité temporelle : O(1)
+
+        @param root : Un noeud de l'arbre AVL.
+        @return : La hauteur du noeud.
+        """
         if not root:
             return 0
         return root.height
 
-    # Get balance factore of the node
     def get_balance(self, root):
+        """
+        Fonction permettant d'obtenir la balance d'un noeud de l'arbre AVL.
+        Complexité temporelle : O(1)
+
+        @param root : Un noeud de l'arbre AVL.
+        @return : La balance du noeud.
+        """
         if not root:
             return 0
         return self.get_height(root.left) - self.get_height(root.right)
 
     def get_min_value_node(self, root):
+        """
+        Fonction permettant d'obtenir un noeud de l'arbre AVL contenant l'espace résiduel
+        minimal en partant d'un certain noeud donné.
+        Complexité temporelle : O(log(n))
+
+        @param root : Un noeud de l'arbre AVL.
+        @return : Le noeud contenant l'espace résiduel minimal.
+        """
         if root is None or root.left is None:
             return root
         return self.get_min_value_node(root.left)
 
     def pre_order(self, root):
+        """
+        Affichage de l'arbre AVL avec un parcours préfixe.
+        Complexité temporelle : O(n)
+
+        @param root : Un noeud de l'arbre AVL.
+        """
         if not root:
             return
         print("{0} ".format(root.residual_space), end="")
