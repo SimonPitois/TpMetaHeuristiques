@@ -4,14 +4,14 @@ from shelf import *
 
 def merge(arr, l, m, r):
     """
-    Fusionne deux parties d'un tableau en utilisant un algorithme de fusion.
+    La fonction fusionne deux sous-tableaux d'items triés par hauteur croissante en un seul tableau trié.
     Complexité temporelle : O(n)
 
-    @param arr : Le tableau à fusionner.
+    @param arr : Le tableau d'items à trier par hauteur croissante.
     @param l : Indice du début de la première moitié du tableau.
     @param m : Indice du milieu du tableau.
     @param r : Indice de fin de la deuxième moitié du tableau.
-    @return : Le tableau après fusion.
+    @return : Le tableau trié.
     """
     n1 = m - l + 1
     n2 = r - m
@@ -51,10 +51,12 @@ def merge(arr, l, m, r):
 
 def merge_sort(arr, l, r):
     """
-    Trie un tableau en utilisant l'algorithme de tri fusion.
+    Tri fusion pour trier un tableau d'items par hauteur croissante. La fonction divise
+    récursivement le tableau d'items en deux jusqu'à ce que chaque sous-tableau ne contienne
+    qu'un seul élément, puis les fusionne pour obtenir le tableau final trié.
     Complexité temporelle : O(n log(n))
 
-    @param arr : Le tableau à trier.
+    @param arr : Le tableau d'items à trier.
     @param l : Indice du début du tableau.
     @param r : Indice de fin du tableau.
     @return : Le tableau trié.
