@@ -1,6 +1,7 @@
 import copy
 import random
 import tkinter as tk
+import time
 
 from item import *
 from strip import *
@@ -201,8 +202,8 @@ def basic_variable_neighborhood_search(items, max):
     while k <= max:
         shaking(tmp, random.randrange(len(items)))
         local_search(tmp)
-        if len(tmp) < len(optimal_solution):
-            optimal_solution = tmp
+        if len(tmp) <= len(optimal_solution):
+            optimal_solution = copy.deepcopy(tmp)
         k = k + 1
     return optimal_solution
 
@@ -277,8 +278,13 @@ if __name__ == '__main__':
     print("")
     """
     print("---------Basic Variable Neighborhood Search---------")
-    optimal = basic_variable_neighborhood_search(items, 1000)
-    print("Nombre de boîtes dans la solution \"optimale\" : ", len(optimal))
+    start_time = time.time()
+    max = 100000
+    print("Pour", max, "itérations :")
+    optimal = basic_variable_neighborhood_search(items, max)
+    end_time = time.time()
+    print("Nombre de boîtes dans la solution \"optimale\" :", len(optimal))
+    print("Temps exécution :", end_time - start_time, "secondes")
     root = tk.Tk()
     root.title("Affichage des boîtes")
     canvas = tk.Canvas(root, width=2000, height=300)
