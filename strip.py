@@ -11,7 +11,6 @@ def merge(arr, l, m, r):
     @param l : Indice du début de la première moitié du tableau.
     @param m : Indice du milieu du tableau.
     @param r : Indice de fin de la deuxième moitié du tableau.
-    @return : Le tableau trié.
     """
     n1 = m - l + 1
     n2 = r - m
@@ -59,7 +58,6 @@ def merge_sort(arr, l, r):
     @param arr : Le tableau d'items à trier.
     @param l : Indice du début du tableau.
     @param r : Indice de fin du tableau.
-    @return : Le tableau trié.
     """
     if l < r:
         m = l + (r - l) // 2
