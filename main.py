@@ -9,12 +9,12 @@ from bin import *
 
 WIDTH = 10
 HEIGHT = 10
-items = [Item(5, 9), Item(4, 2), Item(10, 6),
-         Item(5, 7), Item(6, 3), Item(10, 7),
-         Item(1, 5), Item(3, 5), Item(6, 9),
-         Item(2, 4), Item(6, 7), Item(7, 2),
-         Item(8, 3), Item(4, 10), Item(4, 5),
-         Item(10, 3), Item(7, 8), Item(8, 7)]
+items = [Item(5, 9, 1), Item(4, 2, 2), Item(10, 6, 3),
+         Item(5, 7, 4), Item(6, 3, 5), Item(10, 7, 6),
+         Item(1, 5, 7), Item(3, 5, 8), Item(6, 9, 9),
+         Item(2, 4, 10), Item(6, 7, 11), Item(7, 2, 12),
+         Item(8, 3, 13), Item(4, 10, 14), Item(4, 5, 15),
+         Item(10, 3, 16), Item(7, 8, 17), Item(8, 7, 18)]
 
 
 # --------------------------------- FINITE BEST STRIP ---------------------------------
@@ -224,10 +224,53 @@ def draw_bins(canvas, bins):
         for shelf in bin.shelves:
             for item in shelf.items:
                 canvas.create_rectangle(x, y - item.height * 8, x + item.width * 8, y, fill="green")
+                text_x = (x + item.width * 4)
+                text_y = (y - item.height * 4)
+                canvas.create_text(text_x, text_y, text=item.number, fill="white")
                 x += item.width * 8
             y -= shelf.height * 8
             x = tmp
         x += bin.width * 2 + 100
+
+
+def draw_items(canvas, items):
+    """
+    Permet d'afficher les items à insérer.
+
+    @param canvas : Une interface graphique où dessiner les items.
+    @param items : Les items à insérer.
+    """
+    x0, y0 = 50, 150
+    for item in items:
+        x1 = x0 + item.width * 8
+        canvas.create_rectangle(x0, y0 - item.height * 8, x1, y0, fill="green")
+        text_x = (x0 + x1) / 2
+        text_y = (y0 - item.height * 4)
+        canvas.create_text(text_x, text_y, text=item.number, fill="white")
+        x0 = x1 + 10
+
+
+def draw_strip(canvas, strip):
+    """
+    Permet d'afficher la bande.
+
+    @param canvas : Une interface graphique où dessiner la bande.
+    @param strip : La bande.
+    """
+    x = 50
+    y = 50
+    for shelf in strip.shelves:
+        y += shelf.height * 8
+    for shelf in strip.shelves:
+        for item in shelf.items:
+            canvas.create_rectangle(x, y - item.height * 8, x + item.width * 8, y, fill="green")
+            text_x = (x + item.width * 4)
+            text_y = (y - item.height * 4)
+            canvas.create_text(text_x, text_y, text=item.number, fill="white")
+            x += item.width * 8
+        x = 50
+        canvas.create_rectangle(x, y - shelf.height * 8, x + shelf.width * 8, y, outline="red")
+        y -= shelf.height * 8
 
 
 if __name__ == '__main__':
@@ -279,15 +322,17 @@ if __name__ == '__main__':
     """
     print("---------Basic Variable Neighborhood Search---------")
     start_time = time.time()
-    max = 100000
+    max = 100
     print("Pour", max, "itérations :")
     optimal = basic_variable_neighborhood_search(items, max)
     end_time = time.time()
     print("Nombre de boîtes dans la solution \"optimale\" :", len(optimal))
     print("Temps exécution :", end_time - start_time, "secondes")
     root = tk.Tk()
-    root.title("Affichage des boîtes")
-    canvas = tk.Canvas(root, width=2000, height=300)
+    root.title("Affichage")
+    canvas = tk.Canvas(root, width=3000, height=5000)
     canvas.pack()
     draw_bins(canvas, optimal)
     root.mainloop()
+
+
