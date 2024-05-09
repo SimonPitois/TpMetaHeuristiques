@@ -21,7 +21,7 @@ class Item:
 
         @return: Représentation de l'item sous forme de chaîne.
         """
-        return "Item : (w : %s, h : %s)" % (self.width, self.height)
+        return "Item %s : (w : %s, h : %s)" % (self.number, self.width, self.height)
 
     def __repr__(self):
         """
@@ -30,4 +30,4 @@ class Item:
 
         @return: Représentation de l'item sous forme de chaîne.
         """
-        return "Item : (w : %s, h : %s)" % (self.width, self.height)
+        return "Item %s : (w : %s, h : %s)" % (self.number, self.width, self.height)
